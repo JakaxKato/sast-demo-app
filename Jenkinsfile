@@ -10,17 +10,22 @@ pipeline {
 
         stage('Setup Python Env') {
             steps {
-                sh 'python3 --version'
-                sh 'pip3 install --upgrade pip'
-                sh 'pip3 install bandit'
-                sh 'bandit --version'
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install bandit
+                '''
             }
         }
 
         stage('SAST Analysis') {
             steps {
-                sh 'bandit -f xml -o bandit-output.xml -r . || true'
-                sh 'ls -lah bandit-output.xml || echo "File not found!"'
+                sh '''
+                    . venv/bin/activate
+                    bandit -f xml -o bandit-output.xml -r . || true
+                    ls -lah bandit-output.xml || echo "File not found!"
+                '''
                 recordIssues tools: [bandit(pattern: 'bandit-output.xml')]
             }
         }
