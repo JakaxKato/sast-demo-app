@@ -7,24 +7,14 @@ pipeline {
                 git url: 'https://github.com/JakaxKato/sast-demo-app.git', branch: 'master'
             }
         }
-
-        stage('Setup Virtual Environment & Install Dependencies') {
+        stage('Install Dependencies') {
             steps {
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install bandit
-                '''
+                sh 'pip install --break-system-packages bandit'
             }
         }
-
         stage('SAST Analysis') {
             steps {
-                sh '''
-                    . venv/bin/activate
-                    bandit -f xml -o bandit-output.xml -r . || true
-                '''
+                sh 'bandit -f xml -o bandit-output.xml -r . || true'
                 recordIssues tools: [bandit(pattern: 'bandit-output.xml')]
             }
         }
