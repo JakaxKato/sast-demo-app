@@ -23,7 +23,7 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
-                    bandit -f xml -o bandit-output.xml -r . || true
+                    bandit -f xml -o bandit-output.xml -r . -x venv,__pycache__ || exit_code=$?; [ $exit_code -le 1 ] || exit $exit_code
                 '''
                 recordIssues tools: [bandit(pattern: 'bandit-output.xml')]
             }
