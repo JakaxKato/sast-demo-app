@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        // opsional: jika kamu pakai Python dari Jenkins tool config
-        // python 'Python 3.10'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -24,13 +19,8 @@ pipeline {
 
         stage('SAST Analysis') {
             steps {
-                // Jalankan bandit, jika gagal tetap lanjut
                 sh 'bandit -f xml -o bandit-output.xml -r . || true'
-
-                // Cek file-nya ada atau tidak (debug)
                 sh 'ls -lah bandit-output.xml || echo "File not found!"'
-
-                // Integrasi ke Jenkins Warning Plugin
                 recordIssues tools: [bandit(pattern: 'bandit-output.xml')]
             }
         }
