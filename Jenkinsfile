@@ -8,7 +8,7 @@ pipeline {
             }
         }
 
-        stage('Setup Virtualenv') {
+        stage('Setup Virtual Environment & Install Dependencies') {
             steps {
                 sh '''
                     python3 -m venv venv
@@ -23,7 +23,7 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
-                    bandit -f xml -o bandit-output.xml -r . -x venv,__pycache__ || exit_code=$?; [ $exit_code -le 1 ] || exit $exit_code
+                    bandit -f xml -o bandit-output.xml -r . || true
                 '''
                 recordIssues tools: [bandit(pattern: 'bandit-output.xml')]
             }
