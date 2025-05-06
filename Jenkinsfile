@@ -5,22 +5,30 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning repository...'
-                git 'https://github.com/JakaxKato/sast-demo-app.git' // Ganti dengan URL repo kamu
+                git 'https://github.com/JakaxKato/sast-demo-app.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
-                sh 'pip install -r requirements.txt || true' // agar tetap jalan jika requirements kosong
-                sh 'pip install bandit || true' // pastikan Bandit terinstal
+                echo 'Setting up virtual environment and installing dependencies...'
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt || true
+                    pip install bandit
+                '''
             }
         }
 
         stage('Run Bandit Security Scan') {
             steps {
                 echo 'Running Bandit scan...'
-                sh 'bandit -r . -f xml -o bandit-output.xml || true'
+                sh '''
+                    . venv/bin/activate
+                    bandit -r . -f xml -o bandit-output.xml || true
+                '''
             }
         }
     }
